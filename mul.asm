@@ -14,6 +14,7 @@ _start:
                 sub             rsp, 8 * 128 * 2        ;free space for the answer
                 mov             r8, rdi				    ;the beginning of the answer
                 mov             rdi, rsp
+                add             rcx, rcx
                
                 call            set_zero				;set zero to the answer area
                 mov             rdi, r8
@@ -54,8 +55,10 @@ mul_long_long:
                 mov             r15, [rsi + r9]	    
                 mul             r15             	;multiplies r15 by rax, result to rax
                 add             rax, rbx        	;add previous carry
+                adc             rdx, 0
                 lea             r13, [r10 + r9]	    ;general counter of the result
                 add             [r8 + r13], rax		;add to the result
+                adc             rdx, 0
                 mov             rbx, rdx        	;write carry
                 add             r10, 8          	;move rdi-counter by a qword
                 dec             rcx             	;decrement the inner loop counter 
