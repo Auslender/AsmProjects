@@ -29,19 +29,20 @@ _start:
 ;    sum is written to rdi
 
 sub_long_long:
-                push            rdi
+                push            rdi           
                 push            rsi
                 push            rcx
 
                 clc
 .loop:
-                mov             rax, [rsi]
-                lea             rsi, [rsi + 8]
-                
-                sbb             [rdi], rax
-                lea             rdi, [rdi + 8]
-                dec             rcx
-                jnz             .loop
+                mov             rax, [rdi]       ;put a piece of rsi  to rax
+                sbb             rax, [rsi]       ;subtract a piece of rsi               
+                lea             rsi, [rsi + 8]   ;move rsi by a qword
+                mov             [rdi], rax       ;write a new part of the answer to rdi
+                lea             rdi, [rdi + 8]   ;move rdi by a qword
+
+                dec            rcx               ;recalc loop counter
+                jnz            .loop
 
                 pop             rcx
                 pop             rsi
