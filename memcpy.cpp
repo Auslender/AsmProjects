@@ -43,38 +43,45 @@ void* my_memcpy(void* dest, void const* src, size_t size) {
     }
     size_t tail = (size - pos) % 16;
 
+    char* src_copy = (char*)src + pos;
+    char* dest_copy = (char*)dest + pos;
+
     for (size_t i = pos; i < size - tail; i += 16) {
         __m128i reg;
         __asm__ volatile ("movdqu (%1), %0\n"
-                 "movntdq %0, (%2)\n"
-                 : "=x" (reg)
-                 : "r"((const char*) src + i), "r"((char*)dest + i)
+                          "movntdq %0, (%2)\n"
+                          "add $16, %1\n"
+                          "add $16, %2\n"
+                          : "=x" (reg), "=r" (src_copy), "=r" (dest_copy)
+                          : "1"(src_copy), "2"(dest_copy)
                  : "memory");
     }
-    for (size_t i = (size - tail); i < size; i++) {
-        *((char*)dest + i) = *((char*)src + i);
-    }
     _mm_sfence();
+
+    for (size_t i = 0; i < 16 - tail; i++) {
+        *(dest_copy + i) = *(src_copy + i);
+    }
+
     return dest;
 }
 
 
-int main() {
-    char* src = new char[N];
-    char* dest = new char[N];
-
-//    std::clock_t start1 = std::clock();
-//    memcpy_naive(dest, src, N);
-//    std::clock_t end1 = std::clock();
+//int main() {
+//    char* src = new char[N];
+//    char* dest = new char[N];
 //
-//    memcpy_8(dest, src, N);
-    std::clock_t end2 = std::clock();
-
-    my_memcpy(dest, src, N);
-    std::clock_t end3 = std::clock();
-
-
-    //std::cout << "Memcpy without assembler inlines: " << end1 - start1 << "ms" <<std::endl;
-    //std::cout << "Memcpy by 8 bytes: " << end2 - end1 << "ms" <<std::endl;
-    std::cout << "Memcpy optimized (by 16 bytes): " << end3 - end2 << "ms" <<std::endl;
-}
+////    std::clock_t start1 = std::clock();
+////    memcpy_naive(dest, src, N);
+////    std::clock_t end1 = std::clock();
+////
+////    memcpy_8(dest, src, N);
+//    std::clock_t end2 = std::clock();
+//
+//    my_memcpy(dest, src, N);
+//    std::clock_t end3 = std::clock();
+//
+//
+//    //std::cout << "Memcpy without assembler inlines: " << end1 - start1 << "ms" <<std::endl;
+//    //std::cout << "Memcpy by 8 bytes: " << end2 - end1 << "ms" <<std::endl;
+//    std::cout << "Memcpy optimized (by 16 bytes): " << end3 - end2 << "ms" <<std::endl;
+//}
