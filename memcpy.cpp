@@ -48,7 +48,8 @@ void* my_memcpy(void* dest, void const* src, size_t size) {
         __asm__ ("movdqu (%1), %0\n"
                  "movntdq %0, (%2)\n"
                  : "=x" (reg)
-                 : "r"((const char*) src + i), "r"((char*)dest + i));
+                 : "r"((const char*) src + i), "r"((char*)dest + i)
+                 : "memory");
     }
 
     for (size_t i = (size - tail); i < size; i++) {
