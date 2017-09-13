@@ -21,9 +21,9 @@ void* memcpy_naive (void* dest, const void* src, std:: size_t count) {
 void* memcpy_8(void* dest, const void* src, std:: size_t count) {
     for (size_t i = 0; i < count; i+= 8) {
         size_t buffer = 0;
-        __asm__ volatile("mov %1, %0\n"
+        __asm__ volatile(
+                "mov %1, %0\n"
                 "mov %0, %2"
-                 :
                  : "r"(buffer), "r"((const char*)src + i), "r" ((char*)dest + i));
     }
     return dest;
